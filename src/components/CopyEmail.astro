@@ -1,0 +1,63 @@
+---
+import TactileButton from "./TactileButton.astro";
+import { site } from "../data/site";
+---
+
+<span class="copy-email">
+  <TactileButton variant="secondary" data-copy-email={site.email}>
+    <span class="labels">
+      <span class="label label-idle">Copy email</span>
+      <span class="label label-done">Copied&nbsp;✓</span>
+    </span>
+  </TactileButton>
+  <span class="visually-hidden" role="status" data-copy-status></span>
+</span>
+
+<style>
+  /* Both labels share one grid cell, so the button keeps the width of the wider one: no layout shift. */
+  .labels {
+    display: inline-grid;
+  }
+
+  .label {
+    grid-area: 1 / 1;
+    text-align: center;
+  }
+
+  .label-done,
+  :global([data-state="copied"]) .label-idle {
+    visibility: hidden;
+  }
+
+  :global([data-state="copied"]) .label-done {
+    visibility: visible;
+  }
+</style>
+
+<script>
+  const RESET_AFTER = 2000;
+
+  document.querySelectorAll<HTMLElement>("[data-copy-email]").forEach((button) => {
+    const email = button.dataset.copyEmail;
+    const status = button.parentElement?.querySelector<HTMLElement>("[data-copy-status]");
+    let timer: number | undefined;
+
+    button.addEventListener("click", async () => {
+      if (!email) return;
+      try {
+        await navigator.clipboard.writeText(email);
+      } catch {
+        // Clipboard blocked (permissions or insecure context): fall back to the mail client.
+        window.location.href = `mailto:${email}`;
+        return;
+      }
+      button.dataset.state = "copied";
+      if (status) status.textContent = `Copied ${email} to the clipboard`;
+      window.clearTimeout(timer);
+      timer = window.setTimeout(() => {
+        delete button.dataset.state;
+        if (status) status.textContent = "";
+      }, RESET_AFTER);
+    });
+  });
+</script>

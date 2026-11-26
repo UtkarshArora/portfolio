@@ -1,0 +1,85 @@
+---
+/**
+ * A pressable button: the face sits on a solid base, lifts on hover, and presses down on click.
+ * Renders an <a> when `href` is given, otherwise a <button type="button">.
+ */
+import type { HTMLAttributes } from "astro/types";
+
+type Props = (HTMLAttributes<"a"> & HTMLAttributes<"button">) & {
+  href?: string;
+  variant?: "primary" | "secondary";
+};
+
+const { href, variant = "primary", class: className, ...rest } = Astro.props;
+const Tag = href ? "a" : "button";
+---
+
+<Tag
+  class:list={["tactile", `tactile--${variant}`, className]}
+  href={href}
+  type={href ? undefined : "button"}
+  {...rest}
+>
+  <span class="tactile-face"><slot /></span>
+</Tag>
+
+<style>
+  .tactile {
+    --face: var(--btn-primary-face);
+    --base: var(--btn-primary-base);
+    --text: var(--btn-primary-text);
+    --edge: transparent;
+
+    display: inline-block;
+    /* The face is drawn above the box, so reserve that room up front: hovering never shifts layout. */
+    margin-block-start: var(--base-depth-hover);
+    padding: 0;
+    border: 0;
+    border-radius: var(--radius-m);
+    background: var(--base);
+    text-decoration: none;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+
+  .tactile--secondary {
+    --face: var(--btn-secondary-face);
+    --base: var(--btn-secondary-base);
+    --text: var(--btn-secondary-text);
+    --edge: var(--btn-secondary-base);
+  }
+
+  .tactile-face {
+    display: block;
+    padding: 0.85em 2em;
+    border-radius: inherit;
+    background: var(--face);
+    box-shadow: inset 0 0 0 var(--border-strong) var(--edge);
+    color: var(--text);
+    font-family: var(--font-sans);
+    font-size: var(--step-1);
+    font-weight: 600;
+    line-height: 1.2;
+    white-space: nowrap;
+    transform: translateY(calc(-1 * var(--base-depth)));
+    transition: transform var(--dur-base) var(--ease-spring);
+    will-change: transform;
+  }
+
+  @media (hover: hover) {
+    .tactile:hover .tactile-face {
+      transform: translateY(calc(-1 * var(--base-depth-hover)));
+    }
+  }
+
+  .tactile:active .tactile-face {
+    transform: translateY(calc(-1 * var(--base-depth-active)));
+    transition-duration: var(--dur-fast);
+  }
+
+  .tactile:focus-visible {
+    outline-offset: 4px;
+    border-radius: var(--radius-m);
+  }
+</style>

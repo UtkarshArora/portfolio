@@ -1,0 +1,77 @@
+---
+import Highlight from "./Highlight.astro";
+import TactileButton from "./TactileButton.astro";
+import CopyEmail from "./CopyEmail.astro";
+import Orbit from "./Orbit.astro";
+---
+
+<section class="hero container" aria-labelledby="hero-title">
+  <div class="hero-copy">
+    <p class="eyebrow">Frontend developer · Now building [current work]</p>
+    <h1 id="hero-title">
+      <span class="line">I make the web</span>
+      <span class="line"><Highlight><em>feel</em></Highlight> good to touch.</span>
+    </h1>
+    <p class="lede">
+      I sweat the small stuff: motion, type, and how a button feels under your thumb. Go on, poke
+      the orbit.
+    </p>
+    <div class="actions">
+      <TactileButton href="#projects">See the work <span aria-hidden="true">→</span></TactileButton>
+      <CopyEmail />
+    </div>
+  </div>
+
+  <div class="hero-orbit">
+    <Orbit />
+  </div>
+</section>
+
+<style>
+  .hero {
+    display: grid;
+    gap: var(--space-xl) var(--space-2xl);
+    align-items: center;
+    padding-block: var(--space-2xl) var(--space-2xl);
+  }
+
+  @media (min-width: 56rem) {
+    .hero {
+      grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+      padding-block: var(--space-2xl) var(--space-3xl);
+    }
+  }
+
+  .hero-copy {
+    display: grid;
+    gap: var(--space-m);
+    justify-items: start;
+  }
+
+  .hero h1 {
+    margin-block: var(--space-2xs) var(--space-3xs);
+  }
+
+  .line {
+    display: block;
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-s) var(--space-m);
+    margin-block-start: var(--space-2xs);
+  }
+
+  .hero-orbit {
+    justify-self: center;
+    width: min(100%, 28rem);
+  }
+
+  @media (max-width: 55.99rem) {
+    .hero-orbit {
+      width: min(80%, 22rem);
+    }
+  }
+</style>

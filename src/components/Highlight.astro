@@ -1,0 +1,39 @@
+---
+/** A hand-drawn marker swipe behind a word. It draws in from the left on load. */
+---
+
+<span class="highlight"><slot /></span>
+
+<style>
+  .highlight {
+    position: relative;
+    isolation: isolate;
+    white-space: nowrap;
+  }
+
+  .highlight::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    inset: 0.1em -0.08em 0.02em -0.1em;
+    background: var(--color-highlight-wash);
+    /* Uneven edges so it reads as a marker stroke, not a box */
+    clip-path: polygon(1% 6%, 98% 0%, 100% 88%, 3% 100%, 0% 52%);
+    rotate: -1.5deg;
+    transform-origin: left center;
+    scale: 1 1;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .highlight::before {
+      scale: 0 1;
+      animation: draw-in 700ms var(--ease-out) 350ms forwards;
+    }
+  }
+
+  @keyframes draw-in {
+    to {
+      scale: 1 1;
+    }
+  }
+</style>

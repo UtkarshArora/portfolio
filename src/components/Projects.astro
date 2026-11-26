@@ -1,0 +1,75 @@
+---
+import ProjectCard from "./ProjectCard.astro";
+import { projects } from "../data/projects";
+import { site } from "../data/site";
+---
+
+<section id="projects" class="projects container" aria-labelledby="projects-title">
+  <div class="section-head">
+    <h2 id="projects-title">
+      <span class="index">02</span>
+      Projects
+    </h2>
+    <a class="see-all" href={`${site.github}?tab=repositories`}>
+      All projects <span aria-hidden="true">→</span>
+    </a>
+  </div>
+
+  <ul class="grid" role="list">
+    {projects.map((project) => <ProjectCard project={project} />)}
+  </ul>
+</section>
+
+<style>
+  .projects {
+    padding-block: var(--space-xl) var(--space-3xl);
+    border-top: var(--border-width) solid var(--color-border);
+  }
+
+  .section-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-s);
+    margin-block-end: var(--space-l);
+  }
+
+  .section-head h2 {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-s);
+  }
+
+  .see-all {
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    letter-spacing: var(--tracking-eyebrow);
+    text-transform: uppercase;
+    color: var(--color-highlight);
+    text-decoration: none;
+  }
+
+  .see-all span {
+    display: inline-block;
+    transition: translate var(--dur-base) var(--ease-spring);
+  }
+
+  .see-all:hover span,
+  .see-all:focus-visible span {
+    translate: 4px 0;
+  }
+
+  /* Up to 3 columns. Each card is at least 18rem wide, so narrower screens get fewer columns. */
+  .grid {
+    --min-col: 18rem;
+    display: grid;
+    grid-template-columns: repeat(
+      auto-fill,
+      minmax(max(min(100%, var(--min-col)), (100% - 2 * var(--grid-gap)) / 3), 1fr)
+    );
+    gap: calc(var(--grid-gap) + var(--base-depth-hover) / 2) var(--grid-gap);
+    padding: 0;
+    list-style: none;
+  }
+</style>

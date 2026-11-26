@@ -1,0 +1,257 @@
+---
+/**
+ * The orbit motif: ellipses rotated around a shared centre. Where their short axes overlap they
+ * trace an inner circle. Each ring drifts at its own speed, so the pattern slowly changes.
+ * Interactions (enhanced by the script below):
+ *  - pointer: the rings tilt toward the cursor in 3D
+ *  - click or Enter/Space ("poke"): a burst of spin, and the highlight moves to the next ring
+ * With reduced motion the rings stay still and a poke only moves the highlight.
+ */
+const SIZE = 400;
+const C = SIZE / 2;
+const RX = 178;
+const RY = 72;
+const COUNT = 9;
+const HOT = 4; // ring that starts out highlighted in rust
+const PLANETS = new Set([1, 6]); // rings that carry a teal planet
+
+const rings = Array.from({ length: COUNT }, (_, i) => ({
+  angle: (180 / COUNT) * i,
+  // Spread durations so neighbouring rings drift apart and the pattern keeps changing
+  duration: 64 + ((i * 7) % 5) * 9,
+  planet: PLANETS.has(i),
+  hot: i === HOT,
+}));
+---
+
+<div class="orbit" data-orbit>
+  <button class="orbit-poke" type="button" aria-label="Poke the orbit" data-orbit-poke>
+    <svg
+      class="orbit-svg"
+      viewBox={`0 0 ${SIZE} ${SIZE}`}
+      width={SIZE}
+      height={SIZE}
+      aria-hidden="true"
+      focusable="false"
+    >
+      {
+        rings.map((ring) => (
+          <g transform={`rotate(${ring.angle} ${C} ${C})`}>
+            <g
+              class:list={["ring", { "is-hot": ring.hot }]}
+              data-planet={ring.planet ? "" : undefined}
+              style={`--spin-duration: ${ring.duration}s`}
+            >
+              <ellipse cx={C} cy={C} rx={RX} ry={RY} />
+              <circle class="planet" cx={C + RX} cy={C} r="7" />
+            </g>
+          </g>
+        ))
+      }
+      <g class="sun-track">
+        <circle class="sun" cx={C} cy={C} r="19" />
+      </g>
+    </svg>
+  </button>
+</div>
+
+<style>
+  .orbit {
+    --tilt-x: 0deg;
+    --tilt-y: 0deg;
+    --sun-x: 0px;
+    --sun-y: 0px;
+    perspective: 900px;
+  }
+
+  .orbit-poke {
+    display: block;
+    width: 100%;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: none;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .orbit-poke:focus-visible {
+    outline-offset: -8px;
+    border-radius: 50%;
+  }
+
+  .orbit-svg {
+    width: 100%;
+    height: auto;
+    overflow: visible;
+    transform: rotateX(var(--tilt-x)) rotateY(var(--tilt-y));
+  }
+
+  .ring {
+    transform-origin: 200px 200px; /* SVG user units: the centre of the 400×400 viewBox */
+    animation: spin var(--spin-duration) linear infinite;
+  }
+
+  .ring ellipse {
+    fill: none;
+    stroke: var(--color-accent);
+    stroke-width: 1.5;
+    transition:
+      stroke var(--dur-slow) var(--ease-out),
+      stroke-width var(--dur-slow) var(--ease-out);
+  }
+
+  .planet {
+    fill: var(--color-accent);
+    opacity: 0;
+    transition:
+      fill var(--dur-slow) var(--ease-out),
+      opacity var(--dur-slow) var(--ease-out);
+  }
+
+  .ring[data-planet] .planet,
+  .ring.is-hot .planet {
+    opacity: 1;
+  }
+
+  .ring.is-hot ellipse {
+    stroke: var(--color-highlight);
+    stroke-width: 2.5;
+  }
+
+  .ring.is-hot .planet {
+    fill: var(--color-highlight);
+  }
+
+  .sun-track {
+    transform: translate(var(--sun-x), var(--sun-y));
+  }
+
+  .sun {
+    fill: var(--color-heading);
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+
+  @keyframes spin {
+    to {
+      rotate: 360deg;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ring {
+      animation: none;
+    }
+  }
+</style>
+
+<script>
+  const MAX_TILT = 14; // degrees
+  const MAX_SUN_SHIFT = 10; // px, in SVG units
+  const EASE = 0.08; // how quickly the tilt catches up with the pointer, per frame
+  const BURST_MS = 1400;
+  const BURST_PEAK = 12; // playback-rate multiplier at the start of a poke
+
+  const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)");
+  const finePointer = matchMedia("(hover: hover) and (pointer: fine)");
+
+  function initOrbit(root: HTMLElement) {
+    const svg = root.querySelector<SVGSVGElement>(".orbit-svg");
+    const poke = root.querySelector<HTMLButtonElement>("[data-orbit-poke]");
+    const sun = root.querySelector<SVGCircleElement>(".sun");
+    const rings = Array.from(root.querySelectorAll<SVGGElement>(".ring"));
+    if (!svg || !poke || !sun || rings.length === 0) return;
+
+    /* ── Lean toward the cursor ───────────────────── */
+    const target = { x: 0, y: 0 };
+    const current = { x: 0, y: 0 };
+    let pointer: { x: number; y: number } | null = null;
+    let frame = 0;
+
+    const canLean = () => finePointer.matches && !reducedMotion.matches;
+
+    function tick() {
+      if (pointer) {
+        const rect = svg!.getBoundingClientRect();
+        const cx = rect.left + rect.width / 2;
+        const cy = rect.top + rect.height / 2;
+        // Normalise against the viewport so the pull feels the same from anywhere on the page
+        target.x = Math.max(-1, Math.min(1, (pointer.x - cx) / (window.innerWidth / 2)));
+        target.y = Math.max(-1, Math.min(1, (pointer.y - cy) / (window.innerHeight / 2)));
+      } else {
+        target.x = 0;
+        target.y = 0;
+      }
+
+      current.x += (target.x - current.x) * EASE;
+      current.y += (target.y - current.y) * EASE;
+
+      // Positive rotateX brings the bottom edge forward, negative rotateY the right edge,
+      // so the side nearest the cursor comes toward it.
+      root.style.setProperty("--tilt-x", `${(current.y * MAX_TILT).toFixed(2)}deg`);
+      root.style.setProperty("--tilt-y", `${(-current.x * MAX_TILT).toFixed(2)}deg`);
+      root.style.setProperty("--sun-x", `${(current.x * MAX_SUN_SHIFT).toFixed(2)}px`);
+      root.style.setProperty("--sun-y", `${(current.y * MAX_SUN_SHIFT).toFixed(2)}px`);
+
+      const settled =
+        Math.abs(target.x - current.x) < 0.001 && Math.abs(target.y - current.y) < 0.001;
+      frame = settled && !pointer ? 0 : requestAnimationFrame(tick);
+    }
+
+    const start = () => {
+      if (!frame) frame = requestAnimationFrame(tick);
+    };
+
+    window.addEventListener(
+      "pointermove",
+      (event) => {
+        if (!canLean() || event.pointerType !== "mouse") return;
+        pointer = { x: event.clientX, y: event.clientY };
+        start();
+      },
+      { passive: true },
+    );
+
+    // Pointer left the window, or the preference changed: ease back to flat
+    const release = () => {
+      pointer = null;
+      start();
+    };
+    document.documentElement.addEventListener("pointerleave", release);
+    reducedMotion.addEventListener("change", release);
+    finePointer.addEventListener("change", release);
+
+    /* ── Poke ─────────────────────────────────────── */
+    let hot = Math.max(0, rings.findIndex((ring) => ring.classList.contains("is-hot")));
+    let burstFrame = 0;
+
+    poke.addEventListener("click", () => {
+      rings[hot].classList.remove("is-hot");
+      hot = (hot + 1) % rings.length;
+      rings[hot].classList.add("is-hot");
+
+      if (reducedMotion.matches) return;
+
+      sun.animate(
+        [{ transform: "scale(1)" }, { transform: "scale(1.35)" }, { transform: "scale(1)" }],
+        { duration: 450, easing: "cubic-bezier(0.34, 1.56, 0.64, 1)" },
+      );
+
+      // Speed every ring's spin up, then let it settle back to normal speed
+      const spins = rings.flatMap((ring) => ring.getAnimations());
+      const startedAt = performance.now();
+      cancelAnimationFrame(burstFrame);
+
+      const burst = (now: number) => {
+        const t = Math.min(1, (now - startedAt) / BURST_MS);
+        const rate = 1 + (BURST_PEAK - 1) * (1 - t) ** 3;
+        spins.forEach((spin) => (spin.playbackRate = rate));
+        burstFrame = t < 1 ? requestAnimationFrame(burst) : 0;
+      };
+      burstFrame = requestAnimationFrame(burst);
+    });
+  }
+
+  document.querySelectorAll<HTMLElement>("[data-orbit]").forEach(initOrbit);
+</script>
