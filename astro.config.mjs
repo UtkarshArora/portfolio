@@ -2,7 +2,7 @@
 import { defineConfig } from "astro/config";
 
 export default defineConfig({
-  // Update once the Cloudflare Pages / custom domain URL is known.
-  site: "https://portfolio.pages.dev",
+  // Switch to the custom domain if one is added later.
+  site: "https://utkarsharora.pages.dev",
   output: "static",
 });

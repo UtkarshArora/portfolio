@@ -11,5 +11,5 @@ References:
 - Jhey Tompkins: animated text highlights
 - Lynn Fisher: book-like case-study pages, layouts that react to resize; always include a back-to-home link
 - Robb Owen / Brittany Chiang: minimal 2-column intro
-  Mockup: ./homepage-mockup-v2.png. Its copy is placeholder.
-  Rules: respect prefers-reduced-motion, keyboard accessible, Lighthouse 95+, no layout shift. Commit after each phase.
+  Mockup: ./homepage-mockup-v2.png. Its copy is under design folder.
+  Rules: respect prefers-reduced-motion, keyboard accessible, Lighthouse 95+, no layout shift. Leave changes uncommitted after each phase; the user reviews and commits.
