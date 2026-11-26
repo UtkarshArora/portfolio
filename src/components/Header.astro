@@ -1,4 +1,6 @@
 ---
+import { site } from "../data/site";
+
 interface Props {
   /** Show an explicit "back to home" link. Defaults to true on every page except the homepage. */
   showBack?: boolean;
@@ -9,12 +11,23 @@ const { showBack = !isHome } = Astro.props;
 
 // On the homepage these are in-page anchors; elsewhere they point back to home sections.
 const prefix = isHome ? "" : "/";
-const nav = [
+// Contact is a mailto: link, so it opens the visitor's mail app with To and Subject filled in.
+const mailto = `mailto:${site.email}?subject=${encodeURIComponent(site.emailSubject)}`;
+
+interface NavItem {
+  label: string;
+  href: string;
+  /** Accessible name. Must contain the visible label (WCAG 2.5.3, Label in Name). */
+  ariaLabel?: string;
+  contact?: boolean;
+}
+
+const nav: NavItem[] = [
   { label: "Work", href: `${prefix}#work` },
   { label: "Projects", href: `${prefix}#projects` },
   { label: "Open Source", href: `${prefix}#open-source` },
   { label: "About", href: `${prefix}#about` },
-  { label: "Contact", href: `${prefix}#contact` },
+  { label: "Contact", href: mailto, ariaLabel: "Contact: Email Utkarsh", contact: true },
 ];
 ---
 
@@ -43,7 +56,11 @@ const nav = [
       {
         nav.map((item, i) => (
           <li>
-            <a href={item.href}>
+            <a
+              href={item.href}
+              aria-label={item.ariaLabel}
+              data-contact-link={item.contact ? site.email : undefined}
+            >
               <span class="index" aria-hidden="true">
                 {String(i + 1).padStart(2, "0")}
               </span>
@@ -54,6 +71,9 @@ const nav = [
       }
     </ol>
   </nav>
+
+  <!-- Confirmation that the address was copied. Fixed position, so showing it never shifts layout. -->
+  <p class="toast" role="status" data-contact-toast></p>
 </header>
 
 <style>
@@ -135,4 +155,66 @@ const nav = [
   .nav-list a:focus-visible .nav-label {
     background-size: 100% 1px;
   }
+
+  .toast {
+    position: fixed;
+    z-index: var(--z-cursor);
+    inset-block-end: var(--space-m);
+    inset-inline: 0;
+    width: fit-content;
+    max-width: calc(100% - 2 * var(--page-gutter));
+    margin-inline: auto;
+    padding: var(--space-2xs) var(--space-s);
+    border-radius: var(--radius-m);
+    background: var(--color-heading);
+    color: var(--color-bg);
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    letter-spacing: var(--tracking-mono);
+    box-shadow: 0 4px 0 var(--btn-primary-base);
+    opacity: 0;
+    translate: 0 0.75rem;
+    pointer-events: none;
+    transition:
+      opacity var(--dur-base) var(--ease-out),
+      translate var(--dur-base) var(--ease-spring);
+  }
+
+  .toast:empty {
+    visibility: hidden;
+  }
+
+  .toast.is-visible {
+    opacity: 1;
+    translate: 0 0;
+  }
 </style>
+
+<script>
+  // Contact: the mailto: link opens the visitor's mail app. A page can't tell whether that worked
+  // (browsers hide it), so we also copy the address on every click. Visitors without a mail app
+  // still leave with it.
+  const SHOW_FOR = 2600;
+  const link = document.querySelector<HTMLAnchorElement>("[data-contact-link]");
+  const toast = document.querySelector<HTMLElement>("[data-contact-toast]");
+  let timer: number | undefined;
+
+  link?.addEventListener("click", async () => {
+    // No preventDefault: the browser still follows the mailto: link as normal.
+    const email = link.dataset.contactLink;
+    if (!email || !toast) return;
+    try {
+      await navigator.clipboard.writeText(email);
+    } catch {
+      return; // Clipboard blocked: the mail app (if any) still opens; nothing to confirm.
+    }
+    toast.textContent = `Email copied`;
+    toast.classList.add("is-visible");
+    window.clearTimeout(timer);
+    timer = window.setTimeout(() => {
+      toast.classList.remove("is-visible");
+      // Clear after the fade so screen readers don't re-read stale text
+      window.setTimeout(() => (toast.textContent = ""), 300);
+    }, SHOW_FOR);
+  });
+</script>
