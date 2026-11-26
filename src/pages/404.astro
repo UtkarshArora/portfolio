@@ -1,0 +1,19 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+
+<BaseLayout title="Lost in orbit" description="This page drifted out of orbit.">
+  <section class="container lost" aria-labelledby="lost-title">
+    <p class="eyebrow">404 · Page not found</p>
+    <h1 id="lost-title">This page drifted out of orbit.</h1>
+    <p class="lede">The link may be old, or it may never have existed. <a href="/">Head back home</a>.</p>
+  </section>
+</BaseLayout>
+
+<style>
+  .lost {
+    display: grid;
+    gap: var(--space-m);
+    padding-block: var(--space-3xl);
+  }
+</style>

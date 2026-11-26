@@ -1,0 +1,116 @@
+/*
+ * Design tokens: the only place raw values should live.
+ * Components use var(--…), never hex codes or magic numbers.
+ * Source: CLAUDE.md + design/homepage-mockup-v2.png
+ */
+:root {
+  /* ── Palette (brand) ─────────────────────────────── */
+  --cream: #fff8ec;
+  --burgundy: #5b1a2a;
+  --teal: #0f4c45;
+  --rust: #c64924;
+
+  /* Derived */
+  --paper: #fffdf8; /* card / secondary-button face, lighter than the page */
+  --burgundy-deep: color-mix(in oklab, var(--burgundy) 80%, black); /* primary button base */
+  --burgundy-soft: color-mix(in oklab, var(--burgundy) 75%, var(--cream));
+  --teal-deep: color-mix(in oklab, var(--teal) 85%, black);
+  --rule: color-mix(in oklab, var(--burgundy) 18%, var(--cream)); /* hairlines, card borders */
+  --rust-wash: color-mix(in oklab, var(--rust) 30%, var(--cream)); /* text highlight swipe */
+
+  /* ── Semantic roles ──────────────────────────────── */
+  --color-bg: var(--cream);
+  --color-surface: var(--paper);
+  --color-text: var(--burgundy);
+  --color-text-muted: var(--burgundy-soft);
+  --color-heading: var(--burgundy);
+  --color-accent: var(--teal); /* eyebrows, descriptions, orbit rings */
+  --color-highlight: var(--rust); /* nav numbers, link labels, highlighted orbit */
+  --color-highlight-wash: var(--rust-wash);
+  --color-border: var(--rule);
+  --color-focus: var(--teal);
+
+  --btn-primary-face: var(--burgundy);
+  --btn-primary-base: var(--burgundy-deep);
+  --btn-primary-text: var(--cream);
+  --btn-secondary-face: var(--paper);
+  --btn-secondary-base: var(--teal);
+  --btn-secondary-text: var(--teal);
+
+  /* Placeholder tile colours (project thumbnails) */
+  --tile-teal: color-mix(in oklab, var(--teal) 90%, var(--cream));
+  --tile-burgundy: color-mix(in oklab, var(--burgundy) 88%, var(--cream));
+  --tile-rust: color-mix(in oklab, var(--rust) 92%, var(--cream));
+
+  /* ── Typography ──────────────────────────────────── */
+  /* System fonts only: nothing to download, so no font swap and no layout shift. */
+  --font-serif: Georgia, "Times New Roman", Times, serif;
+  --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas,
+    "Liberation Mono", monospace;
+
+  /* Fluid type scale (360px → 1280px) */
+  --step--1: clamp(0.8rem, 0.78rem + 0.1vw, 0.875rem); /* mono labels, nav */
+  --step-0: clamp(1rem, 0.96rem + 0.18vw, 1.125rem); /* body */
+  --step-1: clamp(1.15rem, 1.08rem + 0.33vw, 1.375rem); /* lede */
+  --step-2: clamp(1.4rem, 1.29rem + 0.5vw, 1.75rem); /* card titles, wordmark */
+  --step-3: clamp(1.75rem, 1.5rem + 1.1vw, 2.5rem); /* section headings */
+  --step-4: clamp(2.25rem, 1.8rem + 2vw, 3.5rem);
+  --step-5: clamp(2.75rem, 1.9rem + 3.8vw, 5rem); /* hero */
+
+  --leading-tight: 1.08;
+  --leading-snug: 1.3;
+  --leading-body: 1.6;
+  --tracking-tight: -0.015em;
+  --tracking-mono: 0.02em;
+  --tracking-eyebrow: 0.14em;
+  --measure: 60ch;
+
+  /* ── Space (fluid) ───────────────────────────────── */
+  --space-3xs: clamp(0.25rem, 0.23rem + 0.09vw, 0.31rem);
+  --space-2xs: clamp(0.5rem, 0.48rem + 0.09vw, 0.56rem);
+  --space-xs: clamp(0.75rem, 0.71rem + 0.18vw, 0.88rem);
+  --space-s: clamp(1rem, 0.96rem + 0.18vw, 1.13rem);
+  --space-m: clamp(1.5rem, 1.43rem + 0.27vw, 1.69rem);
+  --space-l: clamp(2rem, 1.91rem + 0.36vw, 2.25rem);
+  --space-xl: clamp(3rem, 2.87rem + 0.54vw, 3.38rem);
+  --space-2xl: clamp(4rem, 3.83rem + 0.71vw, 4.5rem);
+  --space-3xl: clamp(6rem, 5.74rem + 1.07vw, 6.75rem);
+
+  /* ── Layout ──────────────────────────────────────── */
+  --page-max: 85rem; /* mockup content width ≈ 1360px */
+  --page-gutter: clamp(1.25rem, 5vw, 5rem);
+  --grid-gap: var(--space-m);
+
+  /* ── Shape & depth ───────────────────────────────── */
+  --radius-s: 6px;
+  --radius-m: 10px; /* buttons, thumbnails */
+  --radius-l: 16px; /* cards */
+  --border-width: 1.5px;
+  --border-strong: 2px;
+  /* Tactile "base" under pressable things: the face lifts off it on hover */
+  --base-depth: 10px;
+  --base-depth-hover: 16px;
+  --base-depth-active: 3px;
+
+  /* ── Motion ──────────────────────────────────────── */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --dur-fast: 120ms;
+  --dur-base: 240ms;
+  --dur-slow: 480ms;
+
+  /* ── Layers ──────────────────────────────────────── */
+  --z-header: 10;
+  --z-cursor: 100;
+}
+
+/* Reduced motion: durations collapse, so anything built on tokens respects it. */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-fast: 0.01ms;
+    --dur-base: 0.01ms;
+    --dur-slow: 0.01ms;
+  }
+}

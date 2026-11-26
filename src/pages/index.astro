@@ -1,0 +1,26 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+
+<BaseLayout>
+  <!-- Placeholder hero to check base type styles. The real homepage comes in the next phase. -->
+  <section class="container hero" aria-labelledby="hero-title">
+    <p class="eyebrow">Frontend developer · Now building [current work]</p>
+    <h1 id="hero-title">I make the web <em>feel</em> good to touch.</h1>
+    <p class="lede">
+      I sweat the small stuff: motion, type, and how a button feels under your thumb.
+    </p>
+  </section>
+</BaseLayout>
+
+<style>
+  .hero {
+    display: grid;
+    gap: var(--space-m);
+    padding-block: var(--space-2xl);
+  }
+
+  .hero h1 {
+    max-width: 14ch;
+  }
+</style>

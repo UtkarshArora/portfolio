@@ -1,0 +1,138 @@
+---
+interface Props {
+  /** Show an explicit "back to home" link. Defaults to true on every page except the homepage. */
+  showBack?: boolean;
+}
+
+const isHome = Astro.url.pathname === "/";
+const { showBack = !isHome } = Astro.props;
+
+// On the homepage these are in-page anchors; elsewhere they point back to home sections.
+const prefix = isHome ? "" : "/";
+const nav = [
+  { label: "Work", href: `${prefix}#work` },
+  { label: "Projects", href: `${prefix}#projects` },
+  { label: "Open Source", href: `${prefix}#open-source` },
+  { label: "About", href: `${prefix}#about` },
+  { label: "Contact", href: `${prefix}#contact` },
+];
+---
+
+<header class="site-header container">
+  <div class="brand">
+    {
+      isHome ? (
+        <span class="wordmark">Utkarsh Arora</span>
+      ) : (
+        <a class="wordmark" href="/">
+          Utkarsh Arora
+        </a>
+      )
+    }
+    {
+      showBack && (
+        <a class="back-link mono" href="/">
+          <span class="back-arrow" aria-hidden="true">←</span> Back to home
+        </a>
+      )
+    }
+  </div>
+
+  <nav aria-label="Primary">
+    <ol class="nav-list" role="list">
+      {
+        nav.map((item, i) => (
+          <li>
+            <a href={item.href}>
+              <span class="index" aria-hidden="true">
+                {String(i + 1).padStart(2, "0")}
+              </span>
+              <span class="nav-label">{item.label}</span>
+            </a>
+          </li>
+        ))
+      }
+    </ol>
+  </nav>
+</header>
+
+<style>
+  .site-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-xs) var(--space-l);
+    padding-block: var(--space-l) var(--space-m);
+    border-bottom: var(--border-width) solid var(--color-border);
+  }
+
+  .brand {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--space-2xs) var(--space-m);
+  }
+
+  .wordmark {
+    font-family: var(--font-serif);
+    font-size: var(--step-2);
+    line-height: 1;
+    letter-spacing: var(--tracking-tight);
+    color: var(--color-heading);
+    text-decoration: none;
+  }
+
+  a.wordmark:hover {
+    color: var(--color-highlight);
+  }
+
+  .back-link {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.4em;
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+
+  .back-arrow {
+    display: inline-block;
+    transition: transform var(--dur-base) var(--ease-spring);
+  }
+
+  .back-link:hover .back-arrow,
+  .back-link:focus-visible .back-arrow {
+    transform: translateX(-4px);
+  }
+
+  .nav-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2xs) var(--space-m);
+    padding: 0;
+    list-style: none;
+  }
+
+  .nav-list a {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.6ch;
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    letter-spacing: var(--tracking-mono);
+    color: var(--color-text);
+    text-decoration: none;
+    /* Comfortable tap target without changing the visual rhythm */
+    padding-block: var(--space-3xs);
+  }
+
+  .nav-label {
+    background: linear-gradient(currentColor, currentColor) no-repeat 0 100% / 0 1px;
+    transition: background-size var(--dur-base) var(--ease-out);
+  }
+
+  .nav-list a:hover .nav-label,
+  .nav-list a:focus-visible .nav-label {
+    background-size: 100% 1px;
+  }
+</style>
