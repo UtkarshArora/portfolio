@@ -1,0 +1,73 @@
+---
+import { site } from "../data/site";
+
+const mailto = `mailto:${site.email}?subject=${encodeURIComponent(site.emailSubject)}`;
+
+// Same tab on purpose: visitors decide with Cmd/Ctrl+click. "↗" marks links that leave the site.
+const links = [
+  // Same behaviour as the nav Contact link: opens the mail app and copies the address (script in Header).
+  { label: "Email", href: mailto, ariaLabel: "Contact: Email Utkarsh", contact: true },
+  { label: "GitHub", href: site.github, external: true },
+  { label: "LinkedIn", href: site.linkedin, external: true },
+] as { label: string; href: string; ariaLabel?: string; contact?: boolean; external?: boolean }[];
+---
+
+<footer class="site-footer container">
+  <p class="sign-off">© {new Date().getFullYear()} {site.name}</p>
+  <ul class="links" role="list" aria-label="Elsewhere">
+    {
+      links.map((link) => (
+        <li>
+          <a
+            href={link.href}
+            aria-label={link.ariaLabel}
+            data-contact-link={link.contact ? site.email : undefined}
+          >
+            {link.label}
+            {link.external && <span aria-hidden="true"> ↗</span>}
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</footer>
+
+<style>
+  .site-footer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-s) var(--space-l);
+    padding-block: var(--space-l) var(--space-xl);
+    border-top: var(--border-width) solid var(--color-border);
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    letter-spacing: var(--tracking-mono);
+  }
+
+  .sign-off {
+    margin: 0;
+    color: var(--color-text-muted);
+  }
+
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2xs) var(--space-m);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .links a {
+    display: inline-block;
+    /* Comfortable tap target without changing the visual rhythm */
+    padding-block: var(--space-3xs);
+  }
+
+  .links a:hover {
+    color: var(--color-highlight);
+    text-decoration-color: currentColor;
+  }
+</style>

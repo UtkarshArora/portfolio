@@ -1,6 +1,6 @@
 # Utkarsh's portfolio
 
-Goal: show frontend craft. It must not look generic or AI-made. Hand-built interactions, no UI kits.
+Goal: show frontend craft, but in any interaction, don't make assumptions that I am only a FrontEnd Engineer. It must not look generic or AI-made. Hand-built interactions, no UI kits.
 Stack: Astro, plain CSS (custom properties), vanilla TS islands. No React/Tailwind. Deploy: Cloudflare Pages (free).
 Tokens: cream #FFF8EC (bg), burgundy #5B1A2A (text/headings), teal #0F4C45 (accent), rust #C64924 (highlight/CTA). Headings: Georgia serif. Body: system sans.
 Motif: an orbit (SVG rings + small planets).

@@ -25,7 +25,6 @@ interface NavItem {
 const nav: NavItem[] = [
   { label: "Work", href: `${prefix}#work` },
   { label: "Projects", href: `${prefix}#projects` },
-  { label: "Open Source", href: `${prefix}#open-source` },
   { label: "About", href: `${prefix}#about` },
   { label: "Contact", href: mailto, ariaLabel: "Contact: Email Utkarsh", contact: true },
 ];
@@ -195,11 +194,12 @@ const nav: NavItem[] = [
   // (browsers hide it), so we also copy the address on every click. Visitors without a mail app
   // still leave with it.
   const SHOW_FOR = 2600;
-  const link = document.querySelector<HTMLAnchorElement>("[data-contact-link]");
+  // Every element with data-contact-link (nav Contact, footer Email) shares this behaviour.
+  const links = document.querySelectorAll<HTMLAnchorElement>("[data-contact-link]");
   const toast = document.querySelector<HTMLElement>("[data-contact-toast]");
   let timer: number | undefined;
 
-  link?.addEventListener("click", async () => {
+  links.forEach((link) => link.addEventListener("click", async () => {
     // No preventDefault: the browser still follows the mailto: link as normal.
     const email = link.dataset.contactLink;
     if (!email || !toast) return;
@@ -216,5 +216,5 @@ const nav: NavItem[] = [
       // Clear after the fade so screen readers don't re-read stale text
       window.setTimeout(() => (toast.textContent = ""), 300);
     }, SHOW_FOR);
-  });
+  }));
 </script>
