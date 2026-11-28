@@ -14,11 +14,11 @@ interface Props {
 const siteName = "Utkarsh Arora";
 const {
   title,
-  description = "Utkarsh Arora: Full Stack developer who sweats motion, type, and how interfaces feel.",
+  description = "Utkarsh Arora: Software Engineer who sweats motion, type, and how interfaces feel.",
   showBack,
 } = Astro.props;
 
-const pageTitle = title ? `${title} · ${siteName}` : `${siteName}, Full Stack Developer`;
+const pageTitle = title ? `${title} · ${siteName}` : `${siteName}, Software Engineer`;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 ---
 
