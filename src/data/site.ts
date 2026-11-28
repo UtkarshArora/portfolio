@@ -3,6 +3,6 @@ export const site = {
   email: "arorautkarsh10@gmail.com",
   emailSubject: "Hi from your portfolio",
   github: "https://github.com/UtkarshArora",
-  // TODO(user): confirm this URL; it was inferred from a LinkedIn post slug.
+  cv: "https://drive.google.com/file/d/1oghWA5fwHVyMxJYYfYoeXoeRskCK-ieS/view?usp=sharing",
   linkedin: "https://www.linkedin.com/in/utkarsharora10/",
 };

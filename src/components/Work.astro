@@ -1,0 +1,345 @@
+---
+import { work } from "../data/work";
+import { site } from "../data/site";
+import TactileButton from "./TactileButton.astro";
+
+const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+/** "2021-07" → "Jul 2021" */
+const formatMonth = (ym: string) => {
+  const [year, month] = ym.split("-");
+  return `${MONTHS[Number(month) - 1]} ${year}`;
+};
+---
+
+<section id="work" class="work container" aria-labelledby="work-title">
+  <div class="section-head">
+    <h2 id="work-title">
+      <span class="index">01</span>
+      Work
+    </h2>
+    <a class="see-all see-all--external" href={site.cv}>
+      Full CV <span aria-hidden="true">↗</span>
+    </a>
+  </div>
+
+  <div class="timeline">
+    <!-- The rail is decoration: a track, plus a fill that grows as you scroll. -->
+    <span class="rail" aria-hidden="true"><span class="rail-fill"></span></span>
+
+    <ol class="roles" role="list">
+      {
+        work.map((role) => (
+          <li class="role">
+            {/* DOM order is heading → dates → points, so screen readers hear the role first.
+                On wide screens CSS moves the dates into the left margin. */}
+            <h3 class="role-title">
+              {role.title}{" "}
+              <span class="company">
+                <span aria-hidden="true">· </span>
+                <span class="visually-hidden">at </span>
+                {role.company}
+              </span>
+            </h3>
+
+            <p class="meta">
+              <span class="dates">
+                <time datetime={role.start}>{formatMonth(role.start)}</time>
+                <span aria-hidden="true"> – </span>
+                <span class="visually-hidden"> to </span>
+                {role.end ? <time datetime={role.end}>{formatMonth(role.end)}</time> : "Present"}
+              </span>
+              {role.location && <span class="location">{role.location}</span>}
+            </p>
+
+            <span class="dot" aria-hidden="true" />
+
+            <ul class="points">
+              {role.highlights.map((h) => (
+                <li>
+                  {h.lead && <strong>{h.lead}: </strong>}
+                  {h.text}
+                </li>
+              ))}
+            </ul>
+
+            {role.stack && role.stack.length > 0 && (
+              <ul class="stack" role="list" aria-label="Tech stack">
+                {role.stack.map((tech) => (
+                  <li>{tech}</li>
+                ))}
+              </ul>
+            )}
+          </li>
+        ))
+      }
+    </ol>
+
+    <!-- The timeline ends on the CV: the rail runs into this cap. -->
+    <div class="cv-end">
+      <span class="dot cap" aria-hidden="true"></span>
+      <TactileButton href={site.cv} variant="secondary" class="cv-button">
+        Read the full CV <span aria-hidden="true">↗</span>
+      </TactileButton>
+    </div>
+  </div>
+</section>
+
+<style>
+  .work {
+    padding-block: var(--space-xl) var(--space-3xl);
+    border-top: var(--border-width) solid var(--color-border);
+  }
+
+  /* ---- Timeline geometry ----------------------------------------------------------------
+     Mobile: [rail | content]. Wide: [dates | rail | content].
+     The rail and every dot are positioned from the same variables so they always line up. */
+  .timeline {
+    --rail-col: 2rem;
+    --meta-col: 0rem;
+    --dot: 0.75rem;
+    --line: 2px;
+    --title-size: var(--step-1);
+    --title-leading: 1.3;
+    /* Vertical centre of a role title's first line: where each dot sits. */
+    --dot-y: calc(var(--title-size) * var(--title-leading) / 2);
+    /* The CV row has a fixed height so the rail can stop exactly at its centre. */
+    --end-row: 6rem;
+    position: relative;
+  }
+
+  .rail {
+    position: absolute;
+    inset-block: var(--dot-y) calc(var(--end-row) / 2);
+    inset-inline-start: calc(var(--meta-col) + var(--rail-col) / 2 - var(--line) / 2);
+    width: var(--line);
+    background: var(--color-border);
+  }
+
+  /* Without scroll animation (unsupported browser, or reduced motion) the fill is complete. */
+  .rail-fill {
+    position: absolute;
+    inset: 0;
+    background: var(--color-highlight);
+    transform-origin: top;
+  }
+
+  .roles {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .role {
+    display: grid;
+    grid-template-columns: var(--rail-col) minmax(0, 1fr);
+    grid-template-areas:
+      "dot  title"
+      ".    meta"
+      ".    points"
+      ".    stack";
+    row-gap: var(--space-2xs);
+    /* global.css caps every li at --measure; that's for text, not this whole row. */
+    max-width: none;
+    padding-block-end: var(--space-xl);
+  }
+
+  .role:last-child {
+    padding-block-end: 0;
+  }
+
+  .dot {
+    grid-area: dot;
+    justify-self: center;
+    align-self: start;
+    width: var(--dot);
+    height: var(--dot);
+    margin-block-start: calc(var(--dot-y) - var(--dot) / 2);
+    border-radius: 50%;
+    /* Paint the page colour behind the dot so the rail doesn't show through. */
+    background: var(--color-highlight);
+    box-shadow: 0 0 0 4px var(--color-bg);
+  }
+
+  .role-title {
+    grid-area: title;
+    margin: 0;
+    font-size: var(--title-size);
+    line-height: var(--title-leading);
+  }
+
+  .company {
+    color: var(--color-accent);
+  }
+
+  .meta {
+    grid-area: meta;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 var(--space-s);
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    letter-spacing: var(--tracking-mono);
+    color: var(--color-text-muted);
+  }
+
+  .dates {
+    color: var(--color-text);
+  }
+
+  .points {
+    grid-area: points;
+    display: grid;
+    gap: var(--space-2xs);
+    max-width: 68ch;
+    margin: 0;
+    padding-inline-start: 1.1em;
+  }
+
+  .points li::marker {
+    color: var(--color-highlight);
+  }
+
+  .points strong {
+    font-weight: 600;
+    color: var(--color-heading);
+  }
+
+  /* Same "a · b · c" treatment as the project cards: separators that would start a
+     wrapped line fall outside the list and are clipped. */
+  .stack {
+    --sep: 2.2ch;
+    grid-area: stack;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 var(--sep);
+    margin: var(--space-3xs) 0 0;
+    padding: 0;
+    list-style: none;
+    overflow: hidden;
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    letter-spacing: var(--tracking-mono);
+    color: var(--color-text-muted);
+  }
+
+  .stack li::before {
+    content: "·";
+    display: inline-block;
+    width: var(--sep);
+    margin-inline-start: calc(-1 * var(--sep));
+    text-align: center;
+    color: var(--color-highlight);
+  }
+
+  .cv-end {
+    display: grid;
+    grid-template-columns: var(--rail-col) minmax(0, 1fr);
+    grid-template-areas: "dot button";
+    align-items: center;
+    justify-items: start;
+    height: var(--end-row);
+    margin-block-start: var(--space-l);
+  }
+
+  .cap {
+    align-self: center;
+    margin-block-start: 0;
+  }
+
+  /* Scoped styles don't reach into TactileButton, so :global targets the class we pass it. */
+  .cv-end :global(.cv-button) {
+    grid-area: button;
+    /* The row's fixed height already leaves room for the hover lift. */
+    margin-block-start: 0;
+    /* The face is drawn base-depth above its box; move the box down by that much so the
+       face (not the box) is centred on the cap. */
+    translate: 0 var(--base-depth);
+  }
+
+  /* Wide: dates and location move into a left margin column, like notes in a book. */
+  @media (min-width: 48rem) {
+    .timeline {
+      --meta-col: 11rem;
+      --rail-col: 3rem;
+    }
+
+    .role {
+      grid-template-columns: var(--meta-col) var(--rail-col) minmax(0, 1fr);
+      grid-template-areas:
+        "meta dot title"
+        "meta .   points"
+        "meta .   stack";
+    }
+
+    .cv-end {
+      grid-template-columns: var(--meta-col) var(--rail-col) minmax(0, 1fr);
+      grid-template-areas: ". dot button";
+    }
+
+    .meta {
+      flex-direction: column;
+      align-self: start;
+      align-items: end;
+      text-align: end;
+      /* Line the dates up with the title's first line. */
+      padding-block-start: calc(var(--dot-y) - 0.75em);
+    }
+  }
+
+  /* ---- Scroll animation ------------------------------------------------------------------
+     The fill grows as the timeline passes the middle of the screen, and each dot fills when
+     the line reaches it. Pure CSS (scroll-driven animations): no JS, no layout work, only
+     transform/colour. Browsers without support keep the static, complete timeline above. */
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .rail {
+        view-timeline: --rail block;
+      }
+
+      /* Longhands on purpose: the build's minifier folds a shorthand + animation-timeline into
+         one "animation: … --rail" shorthand, which Chrome rejects (timeline isn't allowed there). */
+      .rail-fill {
+        animation-name: rail-fill;
+        animation-timing-function: linear;
+        animation-fill-mode: both;
+        animation-timeline: --rail;
+        /* 0% when the rail's top reaches mid-screen, 100% when its bottom does. */
+        animation-range: cover 50vh cover calc(100% - 50vh);
+      }
+
+      .dot {
+        animation-name: dot-fill;
+        animation-timing-function: linear;
+        animation-fill-mode: both;
+        animation-timeline: view();
+        /* Fills in the last few pixels before the dot reaches mid-screen, as the line arrives. */
+        animation-range: cover calc(50vh - 1rem) cover 50vh;
+      }
+    }
+  }
+
+  @keyframes rail-fill {
+    from {
+      transform: scaleY(0);
+    }
+    to {
+      transform: scaleY(1);
+    }
+  }
+
+  @keyframes dot-fill {
+    from {
+      background: var(--color-bg);
+      box-shadow:
+        inset 0 0 0 var(--line) var(--color-border),
+        0 0 0 4px var(--color-bg);
+    }
+    to {
+      background: var(--color-highlight);
+      box-shadow:
+        inset 0 0 0 var(--line) var(--color-highlight),
+        0 0 0 4px var(--color-bg);
+    }
+  }
+</style>

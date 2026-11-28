@@ -10,8 +10,8 @@ import { site } from "../data/site";
       <span class="index">02</span>
       Projects
     </h2>
-    <a class="see-all" href={`${site.github}?tab=repositories`}>
-      All projects <span aria-hidden="true">→</span>
+    <a class="see-all see-all--external" href={`${site.github}?tab=repositories`}>
+      All projects <span aria-hidden="true">↗</span>
     </a>
   </div>
 
@@ -24,40 +24,6 @@ import { site } from "../data/site";
   .projects {
     padding-block: var(--space-xl) var(--space-3xl);
     border-top: var(--border-width) solid var(--color-border);
-  }
-
-  .section-head {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: var(--space-s);
-    margin-block-end: var(--space-l);
-  }
-
-  .section-head h2 {
-    display: flex;
-    align-items: baseline;
-    gap: var(--space-s);
-  }
-
-  .see-all {
-    font-family: var(--font-mono);
-    font-size: var(--step--1);
-    letter-spacing: var(--tracking-eyebrow);
-    text-transform: uppercase;
-    color: var(--color-highlight);
-    text-decoration: none;
-  }
-
-  .see-all span {
-    display: inline-block;
-    transition: translate var(--dur-base) var(--ease-spring);
-  }
-
-  .see-all:hover span,
-  .see-all:focus-visible span {
-    translate: 4px 0;
   }
 
   /* Up to 3 columns. Each card is at least 18rem wide, so narrower screens get fewer columns. */

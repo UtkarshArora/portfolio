@@ -167,6 +167,49 @@ a:hover {
   text-decoration-color: currentColor;
 }
 
+/* ── Section heads ───────────────────────────────── */
+/* "01 Work   FULL CV ↗": numbered h2 with a small link right after it (not pushed to the far
+   right, where it was easy to miss). Used by every homepage section. */
+.section-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-s) var(--space-l);
+  margin-block-end: var(--space-l);
+}
+
+.section-head h2 {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-s);
+}
+
+.see-all {
+  font-family: var(--font-mono);
+  /* 2px above the small step: these are the section's main links, so they need to be seen. */
+  font-size: calc(var(--step--1) + 2px);
+  letter-spacing: var(--tracking-eyebrow);
+  text-transform: uppercase;
+  color: var(--color-highlight);
+  text-decoration: none;
+}
+
+/* The arrow nudges the way it points: → right, ↗ (leaves the site) up and right. */
+.see-all span {
+  display: inline-block;
+  transition: translate var(--dur-base) var(--ease-spring);
+}
+
+.see-all:hover span,
+.see-all:focus-visible span {
+  translate: 4px 0;
+}
+
+.see-all--external:hover span,
+.see-all--external:focus-visible span {
+  translate: 2px -2px;
+}
+
 /* ── Focus ───────────────────────────────────────── */
 :focus-visible {
   outline: 2px solid var(--color-focus);
